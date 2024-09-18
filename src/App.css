@@ -1,0 +1,11 @@
+.dashboard{
+    display: flex;
+    gap: 0px;
+}
+.dashboard--content{
+    background-color: #dde6ed;
+    flex: 1;
+    border-radius: 25px;
+    padding: 2rem;
+    display: flex;
+}
