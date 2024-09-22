@@ -1,0 +1,74 @@
+.dashboard {
+  display: flex;
+  gap: 0;
+}
+
+.menu {
+  display: flex;
+  flex-direction: column;
+  gap: 2.3rem;
+  height: 94vh;
+}
+
+.logo {
+  text-align: center;
+  padding: 20px;
+  color: #27374d;
+  align-items: center;
+  display: flex;
+  gap: 20px;
+}
+
+.logo-icon {
+  font-size: 1.4rem;
+}
+
+.menu--list {
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+}
+
+.menu--list .item {
+  display: flex;
+  align-items: center;
+  gap: 20px;
+  font-size: 1.1rem;
+  text-decoration: none;
+  font-weight: 600;
+  padding: 10px;
+  transition: 0.3s ease-in-out;
+  color: #27374d;
+}
+
+.menu--list .item:hover {
+  background-color: #dde6ed;
+  color: #27374d;
+  border-radius: 40px;
+  gap: 15px;
+}
+
+/* Updated Content area styling */
+.content {
+  background-color: #dde6ed;
+  flex: 1;
+  border-radius: 25px;
+  padding: 2rem;
+  display: flex;
+  flex-direction: column;
+}
+
+.content {
+  width: 75%;
+}
+
+.content h1 {
+  margin-bottom: 20px;
+  font-size: 24px;
+  color: #2688d3;
+}
+
+.content p {
+  font-size: 18px;
+  color: #666;
+}
