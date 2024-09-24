@@ -1,0 +1,40 @@
+.content{
+  width: 75%;
+}
+.content--header{
+  display: flex;
+  align-items: center;
+}
+.header--title{
+  color: #2688d3;
+}
+.header--activity{
+  display: flex;
+  align-items: center;
+  gap: 20px;
+}
+.card-container {
+  margin: 20px;
+  padding: 10px;
+
+}
+.data-table {
+  width: 100%;
+  border-collapse: collapse;
+  overflow: scroll;
+}
+.data-table th {
+  background-color: #9fc6e4;
+  color: rgb(0, 0, 0);
+  padding: 10px;
+  text-align: left;
+  border: 1px solid #ddd;
+}
+.data-table td {
+  background-color: white;
+  padding: 10px;
+  text-align: left;
+}
+.data-table tr:hover {
+  background-color: #f1f1f1;
+}
