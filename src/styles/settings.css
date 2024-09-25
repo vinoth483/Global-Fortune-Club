@@ -1,0 +1,115 @@
+.card {
+    background-color: #fff; /* Card background color */
+    border-radius: 8px; /* Rounded corners */
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1); /* Subtle shadow */
+    padding: 20px; /* Inner padding */
+    margin: 20px; /* Space outside the card */
+}
+
+.settings-container {
+    max-width: 600px; /* Max width for the card */
+    margin: auto; /* Centering the card */
+}
+
+
+.setting {
+    margin-bottom: 16px; /* Space between each setting */
+}
+
+.switch {
+    position: relative;
+    display: inline-block;
+    width: 34px;  /* Keep the width unchanged */
+    height: 18px; /* Keep the height unchanged */
+    margin-left: 100px;
+}
+
+.switch input {
+    opacity: 0;
+    width: 0;
+    height: 0;
+}
+
+.slider {
+    position: absolute;
+    cursor: pointer;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background-color: #ccc;
+    transition: .4s;
+    border-radius: 30px; /* Keep the rounded look */
+}
+
+.slider:before {
+    position: absolute;
+    content: "";
+    height: 14px; /* Reduced knob size */
+    width: 14px;  /* Reduced knob size */
+    left: 2px;    /* Adjusted spacing */
+    bottom: 2px;  /* Adjusted spacing */
+    background-color: white;
+    transition: .4s;
+    border-radius: 50%; /* Keep the knob rounded */
+}
+
+input:checked + .slider {
+    background-color: #008CBA;
+}
+
+input:checked + .slider:before {
+    transform: translateX(16px); /* Adjust for smaller size */
+}
+
+/* Slider rounded */
+.slider.round {
+    border-radius: 30px;
+}
+
+.slider.round:before {
+    border-radius: 50%;
+}
+.card {
+    background-color: #fff; /* Card background color */
+    border-radius: 8px; /* Rounded corners */
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1); /* Subtle shadow */
+    padding: 20px; /* Inner padding */
+    margin: 20px; /* Space outside the card */
+    display: flex; /* Enable flexbox */
+    flex-direction: column; /* Stack items vertically */
+    align-items: stretch; /* Stretch items to take full width */
+}
+
+.form-group {
+    display: flex;
+    align-items: center; /* Vertically center items */
+    justify-content: space-between; /* Space between label and input */
+    margin-bottom: 16px; /* Space between each setting */
+}
+
+.label {
+    flex: 0 0 auto; /* Allow label to maintain its width */
+    text-align: left; /* Align label text to the left */
+    width: 200px; /* Fixed width for labels */
+}
+
+.setting-input {
+    margin-left: 8px; /* Space between input and label */
+    flex: 1; /* Allow the input to take remaining space */
+    max-width: 150px; /* Set a max width for the input field */
+}
+
+
+.edit-button {
+    padding: 10px 15px; /* Padding for button */
+    background-color: #008CBA; /* Button color */
+    color: white; /* Button text color */
+    border: none; /* Remove default border */
+    border-radius: 4px; /* Rounded corners */
+    cursor: pointer; /* Pointer cursor */
+}
+
+.edit-button:hover {
+    background-color: #005f8a; /* Darker shade on hover */
+}
