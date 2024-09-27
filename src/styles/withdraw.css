@@ -1,0 +1,179 @@
+.withdraw-container {
+    font-family: Arial, sans-serif;
+    margin: 20px;
+    padding: 20px;
+    background-color: #f4f4f4;
+    border-radius: 8px;
+}
+
+.content {
+    width: 75%;
+    margin: 0 auto;
+}
+
+.content--header {
+    display: flex;
+    align-items: center;
+    flex-wrap: wrap; 
+}
+
+.header--title {
+    color: #2688d3;
+    font-weight: bold;
+    font-size: 1.5rem;
+}
+
+.header--activity {
+    display: flex;
+    align-items: center;
+    gap: 20px;
+}
+
+.card-container {
+    margin: 20px;
+    padding: 10px;
+}
+
+.data-table {
+    width: 100%;
+    border-collapse: collapse;
+    margin-top: 20px;
+    overflow-x: auto; 
+}
+
+.data-table th {
+    background-color: #9fc6e4;
+    color: rgb(0, 0, 0);
+    padding: 10px;
+    text-align: left;
+    border: 1px solid #ddd;
+}
+
+.data-table td {
+    background-color: white;
+    padding: 10px;
+    text-align: left;
+}
+
+.data-table tr:hover {
+    background-color: #f1f1f1;
+}
+
+.data-table th + td {
+    border-top: 10px solid transparent; 
+}
+
+.tab-buttons {
+    display: flex;
+    justify-content: space-between; 
+    margin-bottom: 10px; 
+    flex-wrap: wrap; 
+}
+
+.tab-buttons button {
+    padding: 10px 20px;
+    background-color: #ddd;
+    border: none;
+    border-radius: 4px;
+    cursor: pointer;
+    transition: background-color 0.3s;
+    flex: 1; 
+    margin-right: 0px; 
+    min-width: 120px; 
+}
+
+.tab-buttons button:last-child {
+    margin-right: 0; 
+}
+
+.tab-buttons button.active {
+    background-color: #007BFF;
+    color: white;
+}
+
+.tab-buttons button:hover {
+    background-color: #ccc;
+}
+.pagination-controls {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    margin-top: 20px;
+}
+
+.pagination-controls button {
+    margin: 0 10px;
+    padding: 8px 16px;
+    background-color: #007bff;
+    color: white;
+    border: none;
+    border-radius: 4px;
+    cursor: pointer;
+}
+
+.pagination-controls button:disabled {
+    background-color: #ccc; /* Gray out the disabled button */
+    cursor: not-allowed;
+}
+
+.pagination-controls select {
+    margin-left: 10px;
+    padding: 8px;
+    border: 1px solid #ccc;
+    border-radius: 4px;
+}
+
+
+
+.action-btn {
+    padding: 8px 10px;
+    background-color: #007BFF;
+    color: white;
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+    transition: background-color 0.3s;
+}
+
+.action-btn:hover {
+    background-color: #218838;
+}
+
+@media (max-width: 768px) {
+    .content {
+        width: 100%;
+        padding: 10px;
+    }
+
+    .tab-buttons button {
+        width: 100%;
+        margin: 5px 0;
+    }
+
+    .header--activity {
+        flex-direction: column;
+        gap: 10px; 
+    }
+
+    .data-table {
+        font-size: 14px; 
+    }
+}
+
+@media (max-width: 480px) {
+    .header--title {
+        font-size: 1.2rem; 
+    }
+
+    .data-table th, .data-table td {
+        padding: 8px; 
+    }
+
+    .action-btn {
+        padding: 6px 8px; 
+    }
+
+    .tab-buttons button {
+        padding: 8px; 
+    }
+}
