@@ -1,0 +1,142 @@
+.card {
+    background-color: #fff;
+    border-radius: 8px; 
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1); 
+    padding: 20px; 
+    margin: 20px; 
+    display: flex; 
+    flex-direction: column;
+    align-items: stretch; 
+}
+
+
+.settings-container {
+    max-width: 600px; 
+    margin: auto;
+    padding: 0 10px;
+}
+
+
+.setting {
+    margin-bottom: 16px; 
+    display: flex; 
+    justify-content: space-between; 
+    align-items: center; 
+    width: 100%; 
+}
+
+.form-group {
+    display: flex;
+    align-items: center; 
+    justify-content: space-between; 
+    margin-bottom: 16px;
+}
+
+
+.label {
+    flex: 0 0 auto; 
+    text-align: left;
+    width: 200px; 
+}
+
+.input-container {
+    position: relative; 
+    display: inline-block;
+    width: 100%; 
+}
+
+.input-container input {
+    width: 100%;
+    padding-right: 40px; 
+    box-sizing: border-box;
+}
+
+
+.unit {
+    position: absolute;
+    right: 10px;
+    top: 50%;
+    transform: translateY(-50%); 
+    pointer-events: none; 
+    color: #555; 
+}
+
+
+.setting-input {
+    margin-left: 8px; 
+    flex: 1; 
+    max-width: 150px;
+}
+
+
+.switch {
+    position: relative;
+    display: inline-block;
+    width: 34px; 
+    height: 18px; 
+    margin-left: auto; 
+}
+
+.switch input {
+    opacity: 0;
+    width: 0;
+    height: 0;
+}
+
+
+.slider {
+    position: absolute;
+    cursor: pointer;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background-color: #ccc;
+    transition: .4s;
+    border-radius: 30px; 
+}
+
+.slider:before {
+    position: absolute;
+    content: "";
+    height: 14px; 
+    width: 14px; 
+    left: 2px; 
+    bottom: 2px; 
+    background-color: white;
+    transition: .4s;
+    border-radius: 50%; 
+}
+
+
+input:checked + .slider {
+    background-color: #008CBA;
+}
+
+input:checked + .slider:before {
+    transform: translateX(16px); 
+}
+
+
+.slider.round {
+    border-radius: 30px;
+}
+
+.slider.round:before {
+    border-radius: 50%;
+}
+
+
+.edit-button {
+    padding: 10px 15px; 
+    background-color: #008CBA;
+    color: white; 
+    border: none; 
+    border-radius: 4px; 
+    cursor: pointer; 
+}
+
+
+.edit-button:hover {
+    background-color: #005f8a;
+}
