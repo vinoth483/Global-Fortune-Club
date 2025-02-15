@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import '../styles/settings.css';
-import { useGetSettings } from "../hooks/adminHooks";
+import { useGetSettings,useUpdateSettings,useChangePassword } from "../hooks/adminHooks";
 
 function SettingToggle({ label, initialValue = false }) {
     const [value, setValue] = useState(initialValue);
@@ -21,7 +21,6 @@ function SettingToggle({ label, initialValue = false }) {
         </div>
     );
 }
-
 function SettingInput({ label, initialValue = 0, unit = '' }) {
     const [value, setValue] = useState(initialValue);
 
@@ -45,6 +44,8 @@ function SettingInput({ label, initialValue = 0, unit = '' }) {
 
 function SettingsPage() {
     const { isGetSettingsError, getSettingsError, isGetSettingsLoading, GetSettingsData, getSettings, setGetSettingsData } = useGetSettings();
+    const {isUpdateSettingsError,updateSettingsError,isUpdateSettingsLoading,UpdateSettingsData,updateSettings}= useUpdateSettings();
+    const {changePassword} = useChangePassword()
     const [isPopupOpen, setIsPopupOpen] = useState(false);
     const [oldPassword, setOldPassword] = useState('');
     const [newPassword, setNewPassword] = useState('');
@@ -56,11 +57,37 @@ function SettingsPage() {
     const handleSubmit = (event) => {
         event.preventDefault();
         console.log('Settings saved!', event);
+        let requestPayload = {
+            platformFee:parseInt(event.target[0].value),
+            withdrawFee:parseInt(event.target[1].value),
+            internalTransactionFee:parseInt(event.target[2].value),
+            minimumCryptoDeposit:parseInt(event.target[3].value),
+            minimumInternalTransaction:parseInt(event.target[4].value), 
+            spacer:parseInt(event.target[5].value),
+            withdrawInterval:parseInt(event.target[6].value),
+            minimumWithdraw:parseInt(event.target[7].value),
+            allowNewSignUp:event.target[8].checked,
+            allowNewFcSlot:event.target[9].checked,
+            maintenanceMode:event.target[10].checked,
+            referralComissionSlot:parseInt(event.target[11].value)
+        }
+        updateSettings(requestPayload)
+        // console.log('Settings payload', requestPayload);
+
     };
 
     const handlePasswordChange = (event) => {
         event.preventDefault();
-        console.log('Password changed!');
+        console.log('Password changed!',event);
+        let requestPayload =  {
+        "currentPassword": event.target[0].value,
+        "newPassword": event.target[1].value,
+        "confirmPassword":event.target[1].value 
+        }
+        console.log(requestPayload)
+        changePassword(requestPayload)
+        setNewPassword("")
+        setOldPassword("")
         setIsPopupOpen(false);
     };
 
@@ -94,7 +121,7 @@ function SettingsPage() {
                             <SettingInput unit="Gap" initialValue={GetSettingsData?.spacer} />
                         </div>
                         <div className="form-group">
-                            <label className="label">Withdraw Internal</label>
+                            <label className="label">Withdraw Interval</label>
                             <SettingInput unit="Days" initialValue={GetSettingsData?.withdrawInterval} />
                         </div>
                         <div className="form-group">
@@ -134,7 +161,7 @@ function SettingsPage() {
                             <div className="popup-form-group">
                                 <label>Old Password</label>
                                 <input
-                                    type="password"
+                                    type="text"
                                     value={oldPassword}
                                     onChange={(e) => setOldPassword(e.target.value)}
                                     placeholder="Old Password"
@@ -144,7 +171,7 @@ function SettingsPage() {
                             <div className="popup-form-group">
                                 <label>New Password</label>
                                 <input
-                                    type="password"
+                                    type="text"
                                     value={newPassword}
                                     onChange={(e) => setNewPassword(e.target.value)}
                                     placeholder="New Password"

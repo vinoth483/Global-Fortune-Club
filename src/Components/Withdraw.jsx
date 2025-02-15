@@ -1,77 +1,105 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useCallback } from 'react';
 import { DatePicker } from 'antd';
+import dayjs from "dayjs";
 import moment from 'moment';
 import '../styles/withdraw.css';
+import { message } from 'antd';
+import { useWithdrawList, useUpdateWithdraw } from "../hooks/adminHooks";
 
 const Withdraw = ({ title }) => {
+    const [messageApi, contextHolder] = message.useMessage();
     const [currentTab, setCurrentTab] = useState('pending');
     const [currentPage, setCurrentPage] = useState(1);
     const [searchTerm, setSearchTerm] = useState('');
-    const itemsPerPage = 10;
-    const [selectedDate, setSelectedDate] = useState(moment());
+    const [fromDate, setFromDate] = useState(null);
+    const [toDate, setToDate] = useState(null);
     const [showPopup, setShowPopup] = useState(false);
     const [selectedRequest, setSelectedRequest] = useState(null);
-    const [completedIds, setCompletedIds] = useState([]);
     const [editingId, setEditingId] = useState(null);
+    const [savedTransactionsId, setSavedTransactionsId] = useState("")
+    const { isWithdrawListError, withdrawListError, isWithdrawListLoading, WithdrawListData, getWithdrawList, setWithdrawListData, totalPages } = useWithdrawList()
+    const { isUpdateWithdrawError, updateWithdrawError, isUpdateWithdrawLoading, UpdateWithdrawData, updateWithdraw } = useUpdateWithdraw()
+    const [transactionRefs, setTransactionRefs] = useState("");
 
-    const [pendingRequests, setPendingRequests] = useState([
-        { id: 'User1', date: '2024-07-08', amount: 100, wallet: 'Wallet1', ref: '' },
-        { id: 'User2', date: '2024-07-07', amount: 200, wallet: 'Wallet2', ref: '' },
-        { id: 'User3', date: '2024-07-07', amount: 300, wallet: 'Wallet3', ref: '' },
-        { id: 'User4', date: '2024-07-09', amount: 400, wallet: 'Wallet4', ref: '' },
-        { id: 'User5', date: '2024-07-10', amount: 500, wallet: 'Wallet5', ref: '' },
-        { id: 'User6', date: '2024-07-11', amount: 600, wallet: 'Wallet6', ref: '' },
-        { id: 'User7', date: '2024-07-12', amount: 700, wallet: 'Wallet7', ref: '' },
-        { id: 'User8', date: '2024-07-13', amount: 800, wallet: 'Wallet8', ref: '' },
-        { id: 'User9', date: '2024-07-14', amount: 900, wallet: 'Wallet9', ref: '' },
-        { id: 'User10', date: '2024-07-15', amount: 1000, wallet: 'Wallet10', ref: '' },
-        { id: 'User11', date: '2024-07-16', amount: 1100, wallet: 'Wallet11', ref: '' },
-    ]);
+    function formatDate(isoString) {
+        const date = new Date(isoString);
+        const day = String(date.getDate()).padStart(2, '0');
+        const month = String(date.getMonth() + 1).padStart(2, '0'); // Months are 0-based
+        const year = date.getFullYear();
 
-    const [completedRequests, setCompletedRequests] = useState([]);
-    const [transactionRefs, setTransactionRefs] = useState({});
+        return `${day}/${month}/${year}`;
+    }
+    useEffect(() => {
+        if (isUpdateWithdrawError && updateWithdrawError !== '') {
+            messageApi.open({
+                type: 'error',
+                content: updateWithdrawError,
+            });
+        } else if (!isUpdateWithdrawError && !isUpdateWithdrawLoading && UpdateWithdrawData) {
+            messageApi.open({
+                type: 'success',
+                content: UpdateWithdrawData,
+            });
 
-    const currentData = currentTab === 'pending' ? pendingRequests : completedRequests;
+        }
+    }, [isUpdateWithdrawError, updateWithdrawError, UpdateWithdrawData, messageApi, isUpdateWithdrawLoading]);
 
-    const filteredData = currentData.filter((item) =>
-        item.id.toLowerCase().includes(searchTerm.toLowerCase())
-    );
+    // const totalPages = Math.ceil(filteredData.length / itemsPerPage);
+    const fetchWithdrawList = useCallback(() => {
+        const requestPayload = {
+            limit: 10,
+            page: currentPage,
+            searchValue: searchTerm,
+            status: currentTab,
+        };
+        if(fromDate!=null && toDate!=null){
+            requestPayload["fromDate"] = fromDate
+            requestPayload["toDate"] = toDate
+        }
+        console.log(requestPayload)
+        if((fromDate!=null && toDate!=null) || (fromDate==null && toDate==null)){
+        getWithdrawList(requestPayload)
+            .then(result => console.log(result))
+            .catch(err => console.error(err));
+        }
+    }, [currentPage, searchTerm, currentTab,fromDate,toDate]);
 
-    const totalPages = Math.ceil(filteredData.length / itemsPerPage);
+    useEffect(() => {
+        fetchWithdrawList();
+    }, [fetchWithdrawList]);
 
-    const startIndex = (currentPage - 1) * itemsPerPage;
-    const endIndex = startIndex + itemsPerPage;
-    const paginatedData = filteredData.slice(startIndex, endIndex);
 
+    const updateWithdrawAction = (status) => {
+        let requestPayload = {
+            "externalTransactionId": savedTransactionsId,
+            "status": status
+        }
+        console.log("request payload for update request", requestPayload, selectedRequest)
+        updateWithdraw(requestPayload,selectedRequest || "")
+    }
     const renderTableData = (data) => {
         return data.map((item, index) => (
             <tr key={index}>
-                <td>{item.id}</td>
-                <td>{item.date}</td>
-                <td>{item.amount}</td>
-                <td>{item.wallet}</td>
+                <td>{index + 1}</td>
+                <td>{item.name}</td>
+                <td>{formatDate(item.createdAt)}</td>
+                <td>{item.email}</td>
+                <td>${item.amount !== null ? item.amount.toFixed(2) : "--"}</td>
+                <td>{item.usdtAddress}</td>
                 <td>
                     <div className="input-container">
                         <input
                             type="text"
                             className="no-border-input"
-                            value={transactionRefs[item.id] || item.ref}
-                            onChange={(e) => setTransactionRefs(prev => ({
-                                ...prev,
-                                [item.id]: e.target.value,
-                            }))}
-                            onFocus={() => setEditingId(item.id)}
+                            value={item?.externalTransactionId}
+                            disabled= {currentTab!=="pending"}
+                            onChange={(e) => setTransactionRefs(e.target.value)}
+                            onFocus={() => setEditingId(item._id)}
                         />
-                        {editingId === item.id && (
-                            <button 
-                                className="save-btn" 
-                                onClick={() => {
-                                    setEditingId(null);
-                                    setTransactionRefs(prev => ({
-                                        ...prev,
-                                        [item.id]: transactionRefs[item.id]
-                                    }));
-                                }}
+                        {editingId === item._id && currentTab==="pending" && (
+                            <button
+                                className="save-btn"
+                                onClick={(e) => setSavedTransactionsId(transactionRefs)}
                             >
                                 Save
                             </button>
@@ -81,14 +109,15 @@ const Withdraw = ({ title }) => {
 
                 {currentTab === 'pending' && (
                     <td>
-                        <button 
-                            className="action-btn" 
+                        <button
+                            className="action-btn"
                             onClick={() => {
-                                setSelectedRequest(item);
+                                setSelectedRequest(item._id);
                                 setShowPopup(true);
                             }}
                         >
-                            {completedIds.includes(item.id) ? 'Complete' : 'Pending'}
+                            {/* {completedIds.includes(item.id) ? 'Complete' : 'Pending'} */}
+                            Approve
                         </button>
                     </td>
                 )}
@@ -96,15 +125,15 @@ const Withdraw = ({ title }) => {
         ));
     };
 
-    const handleCompleteRequest = () => {
-        if (selectedRequest) {
-            setCompletedIds((prev) => [...prev, selectedRequest.id]);
-            setCompletedRequests((prev) => [...prev, selectedRequest]);
-            setPendingRequests((prev) => prev.filter(request => request.id !== selectedRequest.id));
-            setShowPopup(false);
-            setSelectedRequest(null);
-        }
-    };
+    // const handleCompleteRequest = () => {
+    //     if (selectedRequest) {
+    //         setCompletedIds((prev) => [...prev, selectedRequest.id]);
+    //         setCompletedRequests((prev) => [...prev, selectedRequest]);
+    //         setPendingRequests((prev) => prev.filter(request => request.id !== selectedRequest.id));
+    //         setShowPopup(false);
+    //         setSelectedRequest(null);
+    //     }
+    // };
 
     const handleNextPage = () => {
         if (currentPage < totalPages) {
@@ -122,60 +151,102 @@ const Withdraw = ({ title }) => {
     const handlePageChange = (event) => {
         setCurrentPage(Number(event.target.value));
     };
+    const handleReset = ()=>{
+        setFromDate(null)
+        setToDate(null)
+    }
 
     return (
         <div className="card-container">
+            {contextHolder}
             <h1>{title}</h1>
-            <div className="search-container">
-                <DatePicker 
-                    value={selectedDate} 
-                    onChange={(date, dateString) => setSelectedDate(dateString)} 
-                    format="DD-MM-YYYY" 
-                    style={{ marginRight: '10px' }} 
-                />
-                <input 
-                    type="text" 
-                    className="search-input" 
-                    placeholder="Search User" 
+            <div className="search-container" style={{ display: "flex", flexDirection: "column", gap: "10px", maxWidth: "400px" }}>
+            {/* Input container for side-by-side layout */}
+            <div style={{ display: "flex", gap: "4px", alignItems: "center" }}>
+                <div style={{ display: "flex", flexDirection: "column" }}>
+                    <label>From Date:</label>
+                    <input 
+                        type="date" 
+                        value={fromDate ? dayjs(fromDate).format("YYYY-MM-DD") : ""}
+                        onChange={(e) => setFromDate(e.target.value)} 
+                        style={{ padding: "5px", width: "150px" }}
+                    />
+                </div>
+
+                <div style={{ display: "flex", flexDirection: "column" }}>
+                    <label>To Date:</label>
+                    <input 
+                        type="date" 
+                        value={toDate ? dayjs(toDate).format("YYYY-MM-DD") : ""}
+                        onChange={(e) => setToDate(e.target.value)} 
+                        style={{ padding: "5px", width: "150px" }}
+                    />
+                </div>
+                   
+                    <button className="refresh-btn" onClick={() => handleReset()} >Reset</button>
+
+               
+            </div>
+
+                {/* <input
+                    type="text"
+                    className="search-input"
+                    placeholder="Search User"
                     value={searchTerm}
                     onChange={(e) => setSearchTerm(e.target.value)}
-                />
-                <button className="refresh-btn" onClick={() => setSearchTerm('')}>Refresh</button>
+                /> */}
+                
             </div>
 
             <div className="tab-buttons">
-                <button 
+                <button
                     onClick={() => {
                         setCurrentTab('pending');
-                        setCurrentPage(1); 
-                    }} 
+                        setCurrentPage(1);
+                    }}
                     className={currentTab === 'pending' ? 'active' : ''}
                 >
-                    Pending ({pendingRequests.length})
+                    Pending
                 </button>
-                <button 
+                <button
                     onClick={() => {
                         setCurrentTab('completed');
                         setCurrentPage(1);
-                    }} 
+                    }}
                     className={currentTab === 'completed' ? 'active' : ''}
                 >
-                    Completed ({completedRequests.length})
+                    Completed
                 </button>
             </div>
 
             <table className="data-table">
                 <thead>
                     <tr>
-                        <th>User ID</th>
+                        <th>S.No</th>
+                        <th>User Name</th>
                         <th>Requested Date</th>
+                        <th>Email</th>
                         <th>Requested Amount</th>
                         <th>USDT Wallet ID</th>
                         <th>Transaction Ref. No</th>
                         {currentTab === 'pending' && <th>Actions</th>}
                     </tr>
                 </thead>
-                <tbody>{renderTableData(paginatedData)}</tbody>
+                <tbody>
+                    {isWithdrawListLoading ? (
+                        <tr>
+                            <td colSpan="5">
+                                <div className="loading-container">
+                                    <div className="loader"></div>
+                                </div>
+                            </td>
+                        </tr>) : (WithdrawListData && WithdrawListData?.length > 0 ? renderTableData(WithdrawListData) : (
+                            <tr>
+                                <td colSpan="5">No Request found</td>
+                            </tr>
+                        ))}
+
+                </tbody>
             </table>
 
             <div className="pagination-controls">
@@ -183,8 +254,8 @@ const Withdraw = ({ title }) => {
                     &lt;
                 </button>
                 <span>Page {currentPage} of {totalPages}</span>
-                <button 
-                    onClick={handleNextPage} 
+                <button
+                    onClick={handleNextPage}
                     disabled={currentPage === totalPages}
                 >
                     &gt;
@@ -203,7 +274,7 @@ const Withdraw = ({ title }) => {
                     <div className="popup-content">
                         <h2>Approval Request</h2>
                         <p>Are you sure you want to approve this request for {selectedRequest.id}?</p>
-                        <button onClick={handleCompleteRequest}>Approve</button>
+                        <button onClick={() => { updateWithdrawAction("approve") }}>Approve</button>
                         <button onClick={() => setShowPopup(false)}>Cancel</button>
                     </div>
                 </div>

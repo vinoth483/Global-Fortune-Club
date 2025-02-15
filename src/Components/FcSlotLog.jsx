@@ -3,13 +3,17 @@ import PropTypes from 'prop-types';
 import '../styles/withdraw.css';
 import { useFcSlotList } from "../hooks/adminHooks";
 import moment from 'moment';
-import { DatePicker } from 'antd';
+import dayjs from "dayjs";
+
 
 const FCSlotLog = ({ title }) => {
     const [currentTab, setCurrentTab] = useState("Active");
     const [currentPage, setCurrentPage] = useState(1);
     const [searchTerm, setSearchTerm] = useState("");
-    const [selectedDate, setSelectedDate] = useState(moment());
+    const [fromDate, setFromDate] = useState(null);
+    const [toDate, setToDate] = useState(null);
+
+
 
     const { isFcSlotListError, isFcSlotListLoading, FcSlotListData, getFcSlotList, totalPages } = useFcSlotList();
 
@@ -19,12 +23,19 @@ const FCSlotLog = ({ title }) => {
             page: currentPage,
             status: currentTab,
             searchValue: searchTerm,
-            date: selectedDate.format('YYYY-MM-DD'),
         };
-        getFcSlotList(requestPayload)
+        if(fromDate!=null && toDate!=null){
+            requestPayload["fromDate"] = fromDate
+            requestPayload["toDate"] = toDate
+        }
+        console.log(requestPayload)
+        if((fromDate!=null && toDate!=null) || (fromDate==null && toDate==null)){
+            getFcSlotList(requestPayload)
             .then(result => console.log(result))
             .catch(err => console.error(err));
-    }, [currentPage, currentTab, searchTerm, selectedDate, getFcSlotList]);
+        }
+
+    }, [currentPage, currentTab, searchTerm, fromDate, toDate]);
 
     useEffect(() => {
         fetchFcSlotList();
@@ -50,18 +61,40 @@ const FCSlotLog = ({ title }) => {
             </tr>
         ));
     };
-
+    const handleReset = ()=>{
+        setFromDate(null)
+        setToDate(null)
+        setSearchTerm("")
+    }
     return (
         <div className="card-container">
             <h1>{title}</h1>
             <div className="search-container">
-                <DatePicker 
-                    value={selectedDate} 
-                    onChange={(date) => setSelectedDate(date)} 
-                    format="DD-MM-YYYY" 
-                    style={{ marginRight: '10px' }} 
-                />
-                <input
+                <div style={{ display: "flex", flexDirection: "column", gap: "10px", maxWidth: "400px" }}>
+                    {/* Input container for side-by-side layout */}
+                    <div style={{ display: "flex", gap: "4px", alignItems: "center" }}>
+                        <div style={{ display: "flex", flexDirection: "column" }}>
+                            <label>From Date:</label>
+                            <input
+                                type="date"
+                                value={fromDate ? dayjs(fromDate).format("YYYY-MM-DD") : ""}
+                                onChange={(e) => setFromDate(e.target.value)}
+                                style={{ padding: "5px", width: "150px" }}
+                            />
+                        </div>
+
+                        <div style={{ display: "flex", flexDirection: "column" }}>
+                            <label>To Date:</label>
+                            <input
+                                type="date"
+                                value={toDate ? dayjs(toDate).format("YYYY-MM-DD") : ""}
+                                onChange={(e) => setToDate(e.target.value)}
+                                style={{ padding: "5px", width: "150px" }}
+                            />
+                        </div>
+
+                    </div>
+                    <input
                     type="text"
                     className="search-input"
                     placeholder="Search by Slot ID"
@@ -69,7 +102,9 @@ const FCSlotLog = ({ title }) => {
                     onChange={(e) => setSearchTerm(e.target.value)}
                     aria-label="Search by Slot ID"
                 />
-                <button className="refresh-btn" onClick={() => setSearchTerm('')}>Refresh</button>
+                <button className="refresh-btn" onClick={() => handleReset()}>Reset</button>
+                </div>
+               
             </div>
             <div className="tab-buttons">
                 <button 
@@ -100,7 +135,9 @@ const FCSlotLog = ({ title }) => {
                 <tbody>
                     {!isFcSlotListLoading ? renderTableData(FcSlotListData) : (
                         <tr>
-                            <td colSpan="5">Loading...</td>
+                            <div className="loading-container">
+                             <div className="loader"></div>
+                         </div>
                         </tr>
                     )}
                 </tbody>

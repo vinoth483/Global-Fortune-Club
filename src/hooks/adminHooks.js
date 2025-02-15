@@ -11,14 +11,14 @@ export const useGetDashboardInfo=()=>{
     const [data,setData]=useState({started: false})
 
 
-    const getDashboardInfo=()=>{
+    const getDashboardInfo=(selectedDate)=>{
 
         setGetDashboardLoding(true)
         setIsGetDashboardError(false)
         setDashboardError("")
         setData({started: false})
 
-        privateApi.get("/user/admin/dashboard")
+        privateApi.get(`/user/admin/dashboard?date=${selectedDate}`)
             .then(resp=>{
                 setData(resp.data.data)
                 setGetDashboardLoding(false)
@@ -49,7 +49,7 @@ export const useGetUserList=()=>{
         try{
             
             const resp = await privateApi.post('/user',payload)
-            let tp = Math.ceil(resp.data?.count / payload?.limit)
+            let tp = Math.ceil((resp.data?.count||0) / payload?.limit)
             console.log(resp.data.data,tp)
             setTotalPages(tp)
             setIsUserListLoading(false)
@@ -63,6 +63,93 @@ export const useGetUserList=()=>{
     }
 
     return {isUserListError,userListError,isUserListLoading,UserListData,getUserList,setUserListData,totalPages}
+}
+
+export const useGetUserDetail=()=>{
+    const [isUserDetailError,setIsUserDetailError]=useState(false)
+    const [userDetailError,setUserDetailError]=useState("")
+    const [isUserDetailLoading,setIsUserDetailLoading]=useState(false)
+    const [UserDetailData,setUserDetailData]=useState("")
+    const getUserDetail=async(userId)=>{
+        setIsUserDetailLoading(true)
+        setIsUserDetailError(false)
+        setUserDetailError("")
+        setUserDetailData("")
+        try{
+            if(userId!==null){
+                const resp = await privateApi.get(`/user/detail/${userId}`)
+                console.log(resp.data.data)
+                setIsUserDetailLoading(false)
+                setUserDetailData(resp?.data?.data)
+            }
+        
+        }catch(err){
+            console.log(err)
+            setIsUserDetailLoading(false)
+            setIsUserDetailError(true)
+            setUserDetailError(err?.response.data.message)
+        }
+    }
+
+    return {isUserDetailError,userDetailError,isUserDetailLoading,UserDetailData,getUserDetail,setUserDetailData}
+}
+
+export const useWithdrawList=()=>{
+    const [isWithdrawListError,setIsWithdrawListError]=useState(false)
+    const [withdrawListError,setWithdrawListError]=useState("")
+    const [isWithdrawListLoading,setIsWithdrawListLoading]=useState(false)
+    const [WithdrawListData,setWithdrawListData]=useState("")
+    const [totalPages,setTotalPages]=useState(0)
+    const getWithdrawList=async(payload)=>{
+        setIsWithdrawListLoading(true)
+        setIsWithdrawListError(false)
+        setWithdrawListError("")
+        setWithdrawListData("")
+        try{
+            
+            const resp = await privateApi.post('/withdrawrequest/all',payload)
+            let tp = Math.ceil((resp.data?.count||0) / payload?.limit)
+            console.log(resp.data.data,tp)
+            setTotalPages(tp)
+            setIsWithdrawListLoading(false)
+            setWithdrawListData(resp?.data?.data)
+        }catch(err){
+            console.log(err)
+            setIsWithdrawListLoading(false)
+            setIsWithdrawListError(true)
+            setWithdrawListError(err?.response.data.message)
+        }
+    }
+
+    return {isWithdrawListError,withdrawListError,isWithdrawListLoading,WithdrawListData,getWithdrawList,setWithdrawListData,totalPages}
+}
+export const useUpdateWithdraw=()=>{
+    const [isUpdateWithdrawError,setIsUpdateWithdrawError]=useState(false)
+    const [updateWithdrawError,setUpdateWithdrawError]=useState("")
+    const [isUpdateWithdrawLoading,setUpdateWithdrawLoading]=useState(false)
+    const [UpdateWithdrawData,setUpdateWithdrawData]=useState("")
+
+    const updateWithdraw=async(requestPayload,withdrawId)=>{
+        setUpdateWithdrawLoading(true)
+        setIsUpdateWithdrawError(false)
+        setUpdateWithdrawError("")
+        setUpdateWithdrawData("")
+        try{
+            console.log(requestPayload)
+            const resp = await privateApi.put(`/withdrawrequest/admin/${withdrawId}`,requestPayload)
+
+            setUpdateWithdrawLoading(false)
+            console.log('update data',resp?.data?.data)
+            setUpdateWithdrawData(resp?.data?.data)
+        }catch(err){
+            console.log(err)
+            setUpdateWithdrawLoading(false)
+            setIsUpdateWithdrawError(true)
+            setUpdateWithdrawError(err?.response.data.message)
+        }
+    }
+
+    return {isUpdateWithdrawError,updateWithdrawError,isUpdateWithdrawLoading,UpdateWithdrawData,updateWithdraw}
 }
 
 export const useFcSlotList=()=>{
@@ -151,4 +238,51 @@ export const useGetSettings=()=>{
     }
 
     return {isGetSettingsError,getSettingsError,isGetSettingsLoading,GetSettingsData,getSettings,setGetSettingsData}
+}
+
+export const useUpdateSettings=()=>{
+    const [isUpdateSettingsError,setIsUpdateSettingsError]=useState(false)
+    const [updateSettingsError,setUpdateSettingsError]=useState("")
+    const [isUpdateSettingsLoading,setUpdateSettingsLoading]=useState(false)
+    const [UpdateSettingsData,setUpdateSettingsData]=useState("")
+
+    const updateSettings=async(requestPayload)=>{
+        setUpdateSettingsLoading(true)
+        setIsUpdateSettingsError(false)
+        setUpdateSettingsError("")
+        setUpdateSettingsData("")
+        try{
+            console.log(requestPayload)
+            const resp = await privateApi.put('/setting',requestPayload)
+
+            setUpdateSettingsLoading(false)
+            console.log('update data',resp?.data?.data)
+            setUpdateSettingsData(resp?.data?.data)
+        }catch(err){
+            console.log(err)
+            setUpdateSettingsLoading(false)
+            setIsUpdateSettingsError(true)
+            setUpdateSettingsData(err?.response.data.message)
+        }
+    }
+
+    return {isUpdateSettingsError,updateSettingsError,isUpdateSettingsLoading,UpdateSettingsData,updateSettings}
+}
+
+export const useChangePassword=()=>{
+
+    const changePassword=async(requestPayload)=>{
+
+        try{
+            console.log(requestPayload)
+            const resp = await privateApi.put('/user/change-password',requestPayload)
+
+            console.log('update pass',resp?.data?.data)
+        }catch(err){
+            console.log(err)
+
+        }
+    }
+
+    return {changePassword}
 }

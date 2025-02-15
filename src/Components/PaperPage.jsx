@@ -9,6 +9,15 @@ const Card = () => {
   const [messageApi, contextHolder] = message.useMessage();
   const [selectedDate, setSelectedDate] = useState(moment());
 
+ const  formatDateToDDMMYY=()=>{
+    const today = new Date(); // Get today's date
+  
+    const day = String(today.getDate()).padStart(2, '0'); // Get day and pad with 0 if needed
+    const month = String(today.getMonth() + 1).padStart(2, '0'); // Get month (0-indexed, so +1) and pad
+    const year = today.getFullYear();
+  
+    return `${year}/${month}/${day}`; 
+  }
   useEffect(() => {
     if (isGetDashboardError && dashboardError !== "") {
       messageApi.open({
@@ -19,10 +28,15 @@ const Card = () => {
   }, [isGetDashboardError, dashboardError, messageApi]);
 
   useEffect(() => {
-    getDashboardInfo();
+    let today = formatDateToDDMMYY()
+    getDashboardInfo(today);
   }, []);
 
   const handleDateChange = (date) => {
+    console.log('in date change')
+    let formattedDate = `${date.$y}/${date.$M+1}/${date.$D}`
+    console.log("selected date",date,formattedDate)
+    getDashboardInfo(formattedDate);
     setSelectedDate(date);
   };
 

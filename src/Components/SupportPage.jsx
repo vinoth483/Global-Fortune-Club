@@ -77,9 +77,9 @@ const SupportPage = () => {
           </button>
           <div className="search-results">
             {/* Dynamically generated search results */}
-            <div>Search result 1</div>
+            {/* <div>Search result 1</div>
             <div>Search result 2</div>
-            <div>Search result 3</div>
+            <div>Search result 3</div> */}
             <div ref={searchEndRef}></div>
           </div>
           {showSearchScrollButton && (
@@ -96,13 +96,13 @@ const SupportPage = () => {
         {/* Chat Window */}
         <div className="chat-window" onScroll={handleChatScroll}>
           <div className="messages">
-            {messages.map((message, index) => (
+            {/* {messages.map((message, index) => (
               <div key={index} className={`message-container ${message.sender.toLowerCase()}-container`}>
                 <div className={`message ${message.sender.toLowerCase()}-message`}>
                   {message.text}
                 </div>
               </div>
-            ))}
+            ))} */}
             <div ref={chatEndRef}></div>
           </div>
           <div className="input-area">

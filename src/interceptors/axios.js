@@ -1,7 +1,7 @@
 import axios from "axios";
 import {getAuth,setAuth} from "../context/localStorage"
-// const BASE_URL = 'http://localhost:3333/api/v01';
-const BASE_URL = 'https://nodeapiv2.globalfc.app/api/v01';
+const BASE_URL = 'http://localhost:3333/api/v01';
+// const BASE_URL = 'https://nodeapiv2.globalfc.app/api/v01';
 
 
 export default axios.create({

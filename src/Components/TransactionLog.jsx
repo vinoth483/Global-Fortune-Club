@@ -1,15 +1,17 @@
 import React, { useState, useEffect } from 'react';
 import PropTypes from 'prop-types';
 import { DatePicker } from 'antd';
+import dayjs from "dayjs";
 import moment from 'moment';
-import '../styles/withdraw.css'; 
+import '../styles/withdraw.css';
 import { useTransactionList } from "../hooks/adminHooks";
 
 const TransactionLog = ({ title }) => {
     const [currentTab, setCurrentTab] = useState('All');
     const [currentPage, setCurrentPage] = useState(1);
     const [searchTerm, setSearchTerm] = useState('');
-    const [selectedDate, setSelectedDate] = useState(moment());
+    const [fromDate, setFromDate] = useState(null);
+    const [toDate, setToDate] = useState(null);
     const { isTransactionListError, transactionListError, isTransactionListLoading, TransactionListData, getTransactionList, setTransactionListData, totalPages } = useTransactionList();
 
     useEffect(() => {
@@ -18,9 +20,14 @@ const TransactionLog = ({ title }) => {
             page: currentPage,
             status: currentTab,
             searchValue: searchTerm,
-            date: selectedDate.format('YYYY-MM-DD'),
+
         };
-        console.log(requestPayload);
+         if(fromDate!=null && toDate!=null){
+            requestPayload["fromDate"] = fromDate
+            requestPayload["toDate"] = toDate
+        }
+        console.log(requestPayload)
+        if((fromDate!=null && toDate!=null) || (fromDate==null && toDate==null)){
         getTransactionList(requestPayload)
             .then(result => {
                 console.log(result);
@@ -28,7 +35,8 @@ const TransactionLog = ({ title }) => {
             .catch(err => {
                 console.log(err);
             });
-    }, [currentPage, currentTab, searchTerm, selectedDate, getTransactionList]);
+        }
+    }, [currentPage, currentTab, searchTerm, fromDate, toDate]);
 
     const renderTableData = (data) => {
         if (!data || !Array.isArray(data) || data.length === 0) {
@@ -46,6 +54,7 @@ const TransactionLog = ({ title }) => {
                 <td>{transaction.userCode}</td>
                 <td>{transaction.description}</td>
                 <td>${transaction.amount.toFixed(2)}</td>
+                <td>{transaction.status}</td>
             </tr>
         ));
     };
@@ -65,73 +74,76 @@ const TransactionLog = ({ title }) => {
     const handlePageChange = (event) => {
         setCurrentPage(Number(event.target.value));
     };
-
-    const renderDummyContent = () => {
-        const dummyData = {
-            All: [{ _id: 1, createdAt: new Date(), userCode: 'User1', description: 'Transaction 1', amount: 100.00 }],
-            'C-IN': [{ _id: 2, createdAt: new Date(), userCode: 'User2', description: 'C-IN Transaction', amount: 200.00 }],
-            'C-OUT': [{ _id: 3, createdAt: new Date(), userCode: 'User3', description: 'C-OUT Transaction', amount: 300.00 }],
-            FC: [{ _id: 4, createdAt: new Date(), userCode: 'User4', description: 'FC Transaction', amount: 400.00 }]
-        };
-        
-        return renderTableData(dummyData[currentTab] || []);
-    };
+    const handleReset = ()=>{
+        setFromDate(null)
+        setToDate(null)
+    }
 
     return (
         <div className="card-container">
             <h1>{title}</h1>
             <div className="search-container">
-                <DatePicker 
-                    value={selectedDate}
-                    onChange={(date) => setSelectedDate(date)}
-                    format="DD/MM/YYYY"
-                    style={{ marginRight: '10px' }}
-                />
-                <input 
-                    type="text" 
-                    className="search-input" 
-                    placeholder="Search by User or ID" 
-                    value={searchTerm}
-                    onChange={(e) => setSearchTerm(e.target.value)}
-                />
-                <button className="refresh-btn" onClick={() => {
-                    setSearchTerm('');
-                    setSelectedDate(moment());
-                }}>Refresh</button>
+                <div style={{ display: "flex", flexDirection: "column", gap: "10px", maxWidth: "400px" }}>
+                    {/* Input container for side-by-side layout */}
+                    <div style={{ display: "flex", gap: "4px", alignItems: "center" }}>
+                        <div style={{ display: "flex", flexDirection: "column" }}>
+                            <label>From Date:</label>
+                            <input
+                                type="date"
+                                value={fromDate ? dayjs(fromDate).format("YYYY-MM-DD") : ""}
+                                onChange={(e) => setFromDate(e.target.value)}
+                                style={{ padding: "5px", width: "150px" }}
+                            />
+                        </div>
+
+                        <div style={{ display: "flex", flexDirection: "column" }}>
+                            <label>To Date:</label>
+                            <input
+                                type="date"
+                                value={toDate ? dayjs(toDate).format("YYYY-MM-DD") : ""}
+                                onChange={(e) => setToDate(e.target.value)}
+                                style={{ padding: "5px", width: "150px" }}
+                            />
+                        </div>
+
+                    </div>
+                    <button className="refresh-btn" onClick={() => handleReset()}>Reset</button>
+                </div>
+
             </div>
             <div className="tab-buttons">
-                <button 
-                    onClick={() => setCurrentTab('All')} 
-                    className={currentTab === 'All' ? 'active' : ''} 
+                <button
+                    onClick={() => setCurrentTab('All')}
+                    className={currentTab === 'All' ? 'active' : ''}
                     aria-pressed={currentTab === 'All'}
                 >
                     All
                 </button>
-                <button 
-                    onClick={() => setCurrentTab('FC')} 
-                    className={currentTab === 'FC' ? 'active' : ''} 
-                    aria-pressed={currentTab === 'FC'}
+                <button
+                    onClick={() => setCurrentTab('Slot')}
+                    className={currentTab === 'Slot' ? 'active' : ''}
+                    aria-pressed={currentTab === 'Slot'}
                 >
                     FC
                 </button>
-                <button 
-                    onClick={() => setCurrentTab('C-IN')} 
-                    className={currentTab === 'C-IN' ? 'active' : ''} 
-                    aria-pressed={currentTab === 'C-IN'}
+                <button
+                    onClick={() => setCurrentTab('Crypto-In')}
+                    className={currentTab === 'Crypto-In' ? 'active' : ''}
+                    aria-pressed={currentTab === 'Crypto-In'}
                 >
                     C-IN
                 </button>
-                <button 
-                    onClick={() => setCurrentTab('C-OUT')} 
-                    className={currentTab === 'C-OUT' ? 'active' : ''} 
-                    aria-pressed={currentTab === 'C-OUT'}
+                <button
+                    onClick={() => setCurrentTab('Crypto-Out')}
+                    className={currentTab === 'Crypto-Out' ? 'active' : ''}
+                    aria-pressed={currentTab === 'Crypto-Out'}
                 >
                     C-OUT
                 </button>
-                <button 
-                    onClick={() => setCurrentTab('INTERNAL')} 
-                    className={currentTab === 'INTERNAL' ? 'active' : ''} 
-                    aria-pressed={currentTab === 'INTERNAL'}
+                <button
+                    onClick={() => setCurrentTab('Internal')}
+                    className={currentTab === 'Internal' ? 'active' : ''}
+                    aria-pressed={currentTab === 'Internal'}
                 >
                     INTERNAL
                 </button>
@@ -144,19 +156,26 @@ const TransactionLog = ({ title }) => {
                         <th>User ID</th>
                         <th>Description</th>
                         <th>Amount</th>
+                        <th>Status</th>
                     </tr>
                 </thead>
                 <tbody>
-                    {!isTransactionListLoading ? renderDummyContent() : (
+                    {isTransactionListLoading ? (
                         <tr>
-                            <td colSpan="5">Loading</td>
+                            <div className="loading-container">
+                             <div className="loader"></div>
+                         </div>
                         </tr>
-                    )}
+                    ):(TransactionListData && TransactionListData?.length > 0 ? renderTableData(TransactionListData) : (
+                        <tr>
+                            <td colSpan="5">No Request found</td>
+                        </tr>
+                    ))}
                 </tbody>
             </table>
             <div className="pagination-controls">
                 <button onClick={handlePrevPage} disabled={currentPage === 1}>
-                    &lt; 
+                    &lt;
                 </button>
                 <span>Page {currentPage} of {totalPages}</span>
                 <button onClick={handleNextPage} disabled={currentPage === totalPages}>
